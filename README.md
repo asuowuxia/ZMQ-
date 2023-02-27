@@ -32,8 +32,9 @@ endif()
 ```
 
 libzmq库的存放路径，如图所示。
-image.png
-image.png
+![image](https://user-images.githubusercontent.com/13326017/221469101-c3f14f70-341f-4e7f-a444-488d2312382f.png)
+![image](https://user-images.githubusercontent.com/13326017/221469269-86ed6b0d-bc5a-4ea2-94f6-28413b42b0fd.png)
+
 
 ** 测试能否成功调用 lizmq这个完美消息队列第三库 **
 ```
