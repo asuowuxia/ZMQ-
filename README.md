@@ -163,5 +163,10 @@ int main(int argc, char* argv[])
 ![image](https://user-images.githubusercontent.com/13326017/221489200-b74906d8-0ff0-4419-bbd9-e1fa4010b40e.png)
 ![image](https://user-images.githubusercontent.com/13326017/221489339-54486795-f39a-444e-aa88-111fa7c74eb7.png)
 
+** 感谢csdn博主 fangye945aFangye945a发现这个美妙的问题，zeromq订阅的主题是发布的主题topic中的开始的子部分主题topic，也会被订阅**
+>经测试如果订阅的不是发布主题topic起始开始的子主题topic内容，不会成功订阅，如：发布主题 456sdf89 订阅主题56s 会订阅失败 456s会订阅成功
+![image](https://user-images.githubusercontent.com/13326017/221491162-5b6f0753-da8b-43f8-89a5-5155e634d23d.png)
+![image](https://user-images.githubusercontent.com/13326017/221491185-ed144935-1f41-437f-8f0c-5193cb84a9a6.png)
+
 
 
