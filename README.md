@@ -32,8 +32,9 @@ endif()
 ```
 
 libzmq库的存放路径，如图所示。
-image.png
-image.png
+![image](https://user-images.githubusercontent.com/13326017/221469101-c3f14f70-341f-4e7f-a444-488d2312382f.png)
+![image](https://user-images.githubusercontent.com/13326017/221469269-86ed6b0d-bc5a-4ea2-94f6-28413b42b0fd.png)
+
 
 ** 测试能否成功调用 lizmq这个完美消息队列第三库 **
 ```
@@ -53,5 +54,114 @@ int main()
 	return 0;
 }
 ```
+**添加zmq中 sub和pub 发布订阅模式**
+```
+int main(int argc, char* argv[])
+{
+	if (argc >= 4 && !strcmp("-sub", argv[2])) // 如果是订阅
+	{
+		/******************* 订阅 *********************/
+		void* context = zmq_ctx_new();
+		void* subscriber = zmq_socket(context, ZMQ_SUB);
+
+		if (!strcmp("-server", argv[1])) // 作为服务端
+			zmq_bind(subscriber, "tcp://*:12345");
+		else if (!strcmp("-client", argv[1])) // 作为客户端
+			zmq_connect(subscriber, "tcp://localhost:12345");
+		else
+		{
+			printf("please add true param:\n"
+				"for example: \n"
+				"-server -sub [topic] [...]\n"
+				"-client -sub [topic] [...]\n"
+				"-server -pub [topic] [msg]\n"
+				"-client -pun [topic] [msg]]n");
+			return 0;
+		}
+
+		int i = 0;
+		for (i = 3; i < argc; ++i)
+		{
+			zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, argv[i],
+				strlen(argv[i]));
+			printf("sub topic:%s\n", argv[i]);
+		}
+		char topic_name[256] = { 0 }; // 订阅主题
+		char payload[1024] = { 0 }; // 接收订阅主题的内容
+		while (1)
+		{
+			memset(topic_name, 0, sizeof(topic_name));
+			memset(payload, 0, sizeof(payload));
+
+			int size = zmq_recv(subscriber, topic_name, sizeof(topic_name), 0);
+			if (size == -1)
+			{
+				printf("recv topic error！");
+			}
+			size = zmq_recv(subscriber, payload, sizeof(payload), 0);
+			if (size == -1)
+			{
+				printf("recv payload error!");
+			}
+			printf("Topic:%s  Msg:%s\n", topic_name, payload);
+		}
+		zmq_close(subscriber);
+		zmq_ctx_destroy(context);
+		return 0;
+		/**************** end ****************/
+	}
+	else if (argc == 5 && !strcmp("-pub", argv[2]))
+	{
+		/************** 发布 *****************/
+		void* context = zmq_ctx_new();
+		void* publisher = zmq_socket(context, ZMQ_PUB);
+		if (!strcmp("-server", argv[1])) // 作服务端
+			zmq_bind(publisher, "tcp://*:12345");
+		else if (!strcmp("-client", argv[1])) // 作客户端
+			zmq_connect(publisher, "tcp://localhost:12345");
+		else
+		{
+
+			printf("Please add true param:\n"
+				"For example:\n"
+				"-server -sub [topic1] [...]\n"
+				"-client -sub [topic1] [...]\n"
+				"-server -pub [topic] [msg]\n"
+				"-client -pun [topic] [msg]\n");
+			return 0;
+		}
+		while (1)
+		{
+			zmq_send(publisher, argv[3], strlen(argv[3]), ZMQ_SNDMORE); //指定要发布消息的主题
+			zmq_send(publisher, argv[4], strlen(argv[4]), 0);   //向设置的主题发布消息
+
+			//zmq_send (publisher, "hello", strlen("hello"), ZMQ_SNDMORE); //可发布多个主题的消息
+			//zmq_send (publisher, "world", strlen("world"), 0);
+			// sleep(1);									//每秒发布一次
+			Sleep(1);
+		}
+
+		zmq_close(publisher);		//退出时调用
+		zmq_ctx_destroy(context);
+		return 0;
+		/*************************** End  ***************************/
+	}
+	else
+	{
+		printf("Please add true param:\n"
+			"For example:\n"
+			"-server -sub [topic1] [...]\n"
+			"-client -sub [topic1] [...]\n"
+			"-server -pub [topic] [msg]\n"
+			"-client -pun [topic] [msg]\n");
+		return 0;
+	}
+	return 0;
+}
+```
+** 再次发现了VS的强大，对cmake项目右键可以打开shellpower控制台窗口，然后通过终端运行可执行文件exe实例**
+![image](https://user-images.githubusercontent.com/13326017/221489200-b74906d8-0ff0-4419-bbd9-e1fa4010b40e.png)
+![image](https://user-images.githubusercontent.com/13326017/221489339-54486795-f39a-444e-aa88-111fa7c74eb7.png)
+
 
 
